@@ -35,17 +35,12 @@ class ShooterSubsystem : public frc2::SubsystemBase {
 
   // Subsystem methods go here.
 
-  void Set(double speed);
+  void ResetEncoders();
   void Shoot(bool act);
   void SetConveyor(double speed);
-  double Get();
   void ToggleTarget();
-  //void SetAutonomous(bool state);
-  void ToggleIntake();
   void SetIntake(bool state, bool motorOnly);
-  void RevertIntake(bool state);
-  void ToggleConveyor();
-  void RevertShoot(bool act);
+  void ToggleIntake();
   void SetCompressor(bool state);
 
 
@@ -57,13 +52,14 @@ class ShooterSubsystem : public frc2::SubsystemBase {
   // The motor controllers
   WPI_VictorSPX m_left;
   WPI_VictorSPX m_right;
-  WPI_VictorSPX m_middle;
   WPI_VictorSPX m_conveyor;
-  WPI_VictorSPX m_leftIntake;
-  WPI_VictorSPX m_rightIntake;
+  WPI_VictorSPX m_intake;
   
-  rev::CANSparkMax m_intake;
-  frc::DoubleSolenoid target;
+  frc::Encoder m_ShooterEncoder;
+
+  frc::Encoder m_AimEncoder;
+
+  rev::CANSparkMax m_trigger;
   frc::DoubleSolenoid intake;
   double ActualSpeed;
   frc::PowerDistribution m_pdp;
@@ -71,6 +67,5 @@ class ShooterSubsystem : public frc2::SubsystemBase {
   frc::Compressor compressor;
   // The motors on the right side of the drive
   frc::MotorControllerGroup m_motors{m_right, m_left};
-  frc::MotorControllerGroup m_shooter{m_middle, m_conveyor};
 
 };

@@ -30,8 +30,8 @@ constexpr int kLeftMotor2Port = 8;
 constexpr int kRightMotor1Port = 7;
 constexpr int kRightMotor2Port = 9;
 
-constexpr int kLeftEncoderPorts[]{8, 7};
-constexpr int kRightEncoderPorts[]{4, 3};
+constexpr int kLeftEncoderPorts[]{0, 1};
+constexpr int kRightEncoderPorts[]{2, 3};
 constexpr bool kLeftEncoderReversed = false;
 constexpr bool kRightEncoderReversed = false;
 
@@ -41,9 +41,6 @@ extern const frc::DifferentialDriveKinematics kDriveKinematics;
 constexpr int kEncoderCPR = 8192;
 constexpr double kWheelDiameterInches = 6;
 constexpr double kEncoderDistancePerPulse = 0.48/2048.;
-    // Assumes the encoders are directly mounted on the wheel shafts
-    //(kWheelDiameterInches * wpi::numbers::pi) /
-    //static_cast<double>(kEncoderCPR);
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
 // These characterization values MUST be determined either experimentally or
@@ -54,11 +51,6 @@ constexpr auto ks = 1.06_V;
 constexpr auto kv = 2.49 * 1_V * 1_s / 1_m;
 constexpr auto ka = 0.0375 * 1_V * 1_s * 1_s / 1_m;
 
-// Example value only - as above, this must be tuned for your drive!
-//constexpr double kPDriveVel = 0.848;
-/*constexpr double kPDriveVel = 0.848;
-constexpr double kIDriveVel = 0.4;
-constexpr double kDDriveVel = 0.1;*/
 constexpr double kPDriveVel = 0.1;
 constexpr double kIDriveVel = 0.0;
 constexpr double kDDriveVel = 0.0;
@@ -75,28 +67,34 @@ constexpr double kRamseteZeta = 0.7;
 
 
 namespace ShooterConstants {
-constexpr int kLeftMotorPort = 1;
-constexpr int kRightMotorPort = 2;
-constexpr int kMiddleMotorPort = 3;
-constexpr int kConveyorMotorPort = 0;
-constexpr int kIntakeMotorPort = 4;
-constexpr int kIntakeLeftMotorPort = 5;
-constexpr int kIntakeRightMotorPort = 10;
+constexpr int kLeftMotorPort = 4;
+constexpr int kRightMotorPort = 5;
+constexpr int kConveyorMotorPort = 3;
+constexpr int kIntakeMotorPort = 0;
+constexpr int kAimMotorPort = 1;
+constexpr int kTriggerMotorPort = 1;
 
+constexpr int kShooterEncoderPorts[]{4,5};
+constexpr int kAimEncoderPorts[]{6,7};
 
-constexpr int kTargetUp = 2;
-constexpr int kTargetDown = 3;
 
 constexpr int kIntakeUp = 0;
 constexpr int kIntakeDown = 1;
 
 constexpr int kMaxSpeed = 1;
 constexpr double kMaxSpeedIntake = 0.2;
+
+constexpr int kEncoderCPR = 8192;
+constexpr double kWheelDiameterInches = 6;
+constexpr double kEncoderDistancePerPulse = 0.48/2048.;
 }  // namespace DriveConstants
 
+namespace ClimberConstants{
+constexpr int kClimberMotorPort = 2;
+}
 namespace OIConstants {
 constexpr int kDriverControllerPort = 0;
-constexpr int kDriverControllerPort2 = 1;
+constexpr int kOperatorControllerPort = 1;
 
  
 }  // namespace OIConstants
