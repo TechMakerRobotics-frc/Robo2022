@@ -16,9 +16,10 @@ ShooterSubsystem::ShooterSubsystem()
       m_conveyor{kConveyorMotorPort},
       m_leftIntake{kIntakeLeftMotorPort},
       m_rightIntake{kIntakeRightMotorPort},
-      target{kTargetUp, kTargetDown},
-      intake{kIntakeUp, kIntakeDown},
-      m_intake{kIntakeMotorPort, rev::CANSparkMaxLowLevel::MotorType::kBrushless}
+      target{frc::PneumaticsModuleType::CTREPCM, kTargetUp, kTargetDown},
+      intake{frc::PneumaticsModuleType::CTREPCM, kIntakeUp, kIntakeDown},
+      m_intake{kIntakeMotorPort, rev::CANSparkMaxLowLevel::MotorType::kBrushless},
+      compressor{frc::PneumaticsModuleType::CTREPCM}
 {
   m_shooter.SetInverted(true);
   m_conveyor.SetInverted(true);
@@ -163,9 +164,9 @@ void ShooterSubsystem::ToggleConveyor()
 void ShooterSubsystem::SetCompressor(bool state)
 {
   if (state)
-    compressor.Start();
+    compressor.Enabled();
   else
-    compressor.Stop();
+    compressor.Disable();
 }
 double ShooterSubsystem::Get()
 {

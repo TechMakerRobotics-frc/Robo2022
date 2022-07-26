@@ -12,7 +12,7 @@
 #include <units/voltage.h>
 //#include "WPILib.h"
 #include "AHRS.h"
-#include <frc/SpeedControllerGroup.h>
+#include <frc/motorcontrol/MotorControllerGroup.h>
 #include "ctre/Phoenix.h"
 #include <frc/DoubleSolenoid.h>
 #include <frc/Compressor.h>
@@ -66,11 +66,11 @@ class ShooterSubsystem : public frc2::SubsystemBase {
   frc::DoubleSolenoid target;
   frc::DoubleSolenoid intake;
   double ActualSpeed;
-  frc::PowerDistributionPanel m_pdp;
+  frc::PowerDistribution m_pdp;
 
   frc::Compressor compressor;
   // The motors on the right side of the drive
-  frc::SpeedControllerGroup m_motors{m_right, m_left};
-  frc::SpeedControllerGroup m_shooter{m_middle, m_conveyor};
+  frc::MotorControllerGroup m_motors{m_right, m_left};
+  frc::MotorControllerGroup m_shooter{m_middle, m_conveyor};
 
 };

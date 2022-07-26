@@ -31,8 +31,8 @@ RobotContainer::RobotContainer()
     // Set up default drive command
     m_drive.SetDefaultCommand(frc2::RunCommand(
         [this] {
-            m_drive.ArcadeDrive(-m_driverController.GetY(lHand),
-                                m_driverController.GetX(rHand) * 0.8);
+            m_drive.ArcadeDrive(-m_driverController.GetLeftY(),
+                                m_driverController.GetRightX() * 0.8);
         },
         {&m_drive}));
     //frc::CameraServer::StartAutomaticCapture();
@@ -45,7 +45,7 @@ void RobotContainer::ConfigureButtonBindings()
     frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kX)
         .WhenPressed(&m_shooterToggle);
 
-    frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kBumperRight)
+    frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kRightBumper)
         .WhenReleased(&m_driveFullSpeed)
         .WhenPressed(&m_driveHalfSpeed);
     frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kA)

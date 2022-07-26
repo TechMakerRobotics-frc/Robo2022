@@ -25,10 +25,10 @@
  */
 
 namespace DriveConstants {
-constexpr int kLeftMotor1Port = 4;
-constexpr int kLeftMotor2Port = 6;
-constexpr int kRightMotor1Port = 5;
-constexpr int kRightMotor2Port = 7;
+constexpr int kLeftMotor1Port = 6;
+constexpr int kLeftMotor2Port = 8;
+constexpr int kRightMotor1Port = 7;
+constexpr int kRightMotor2Port = 9;
 
 constexpr int kLeftEncoderPorts[]{8, 7};
 constexpr int kRightEncoderPorts[]{4, 3};
@@ -79,8 +79,8 @@ constexpr int kLeftMotorPort = 1;
 constexpr int kRightMotorPort = 2;
 constexpr int kMiddleMotorPort = 3;
 constexpr int kConveyorMotorPort = 0;
-constexpr int kIntakeMotorPort = 8;
-constexpr int kIntakeLeftMotorPort = 9;
+constexpr int kIntakeMotorPort = 4;
+constexpr int kIntakeLeftMotorPort = 5;
 constexpr int kIntakeRightMotorPort = 10;
 
 
@@ -93,8 +93,7 @@ constexpr int kIntakeDown = 1;
 constexpr int kMaxSpeed = 1;
 constexpr double kMaxSpeedIntake = 0.2;
 }  // namespace DriveConstants
-constexpr frc::GenericHID::JoystickHand lHand = frc::GenericHID::kLeftHand;
-constexpr frc::GenericHID::JoystickHand rHand = frc::GenericHID::kRightHand;
+
 namespace OIConstants {
 constexpr int kDriverControllerPort = 0;
 constexpr int kDriverControllerPort2 = 1;
