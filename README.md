@@ -1,6 +1,8 @@
-CAN
+## TECHMAKER ROBOTICS 2022
 
-VICTOR SPX
+*CAN*
+
+**VICTOR SPX**
 0 - Intake
 1 - Mira (aim)
 2 - Climber
@@ -12,24 +14,25 @@ VICTOR SPX
 8 - Drive Left
 9 - Drive Right
 
-Spark Max
+**Spark Max**
 0 - Tiro (trigger)
 
-ENCODERS
+*ENCODERS*
 0,1 - Roda direita
 2,3 - Roda esquerda
 4,5 - Shooter
 6,7 - Mira
 
 
+*Controle XBOX*
+Somente navegação
 
-Controle personalizado
+*Controle personalizado*
 
 9  10  11  12
 5   6   7   8
 1   2   3   4
         
-
 1 - Shooter aim
     Faz leitura da Lumilight
     ajusta Mira
