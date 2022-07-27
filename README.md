@@ -13,6 +13,7 @@ Projeto do Robo da Techmaker Robotics 2022 - Cargo Connect
 ## Rede CAN <a name = "CAN"></a>
 
 **VICTOR SPX**
+|-|----------------|
 |0|Intake|
 |1|Mira (aim)|
 |2|Climber|
