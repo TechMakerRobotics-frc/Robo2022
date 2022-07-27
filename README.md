@@ -13,7 +13,8 @@ Projeto do Robo da Techmaker Robotics 2022 - Cargo Connect
 ## Rede CAN <a name = "CAN"></a>
 
 **VICTOR SPX**
-|-|----------------|
+|_Endereço_|_Função_|
+|-|-|
 |0|Intake|
 |1|Mira (aim)|
 |2|Climber|
@@ -26,17 +27,23 @@ Projeto do Robo da Techmaker Robotics 2022 - Cargo Connect
 |9|Drive Right|
 
 **Spark Max**
+|_Endereço_|_Função_|
+|-|-|
 |0|Tiro (trigger)|
 
 ## Sensores <a name = "Sensors"></a>
 
 **ENCODERS**
+|_A_|_B_|_Função_|
+|-|-|-|
 |0|1|Roda direita|
 |2|3|Roda esquerda|
 |4|5|Shooter|
 |6|7|Mira|
 
 **Cor**
+|_Endereço_|_Função_|
+|-|-|
 |Analog 0|Vermelho|
 |Analog 1|Azul|
 |Analog 2|Verde|
@@ -44,15 +51,17 @@ Projeto do Robo da Techmaker Robotics 2022 - Cargo Connect
 ## Controles <a name = "controls"></a>
 
 **Controle XBOX**
+
 Somente navegação
 
 **Controle personalizado**
 
 *Disposição dos botões*
-
-|9|10|11|12|
-|5| 6| 7| 8|
-|1| 2| 3| 4|
+| |_C1_|_C2_|_C3_|_C4_|
+|-|-|-|-|-|
+|**_L1_**|9|10|11|12|
+|**_L2_**|5|6|7|8|
+|**_L3_**|1|2|3|4|
         
 1 - Shooter aim
     Faz leitura da Lumilight
