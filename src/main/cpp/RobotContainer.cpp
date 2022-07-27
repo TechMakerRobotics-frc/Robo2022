@@ -42,13 +42,16 @@ RobotContainer::RobotContainer()
 void RobotContainer::ConfigureButtonBindings()
 {
   
-
+    
+    /*
+    //Os comandos do Joystick foram desabilitados para evitar acionamentos por acidentes
     frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kRightBumper)
         .WhenReleased(&m_driveFullSpeed)
         .WhenPressed(&m_driveHalfSpeed);
     frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kA)
         .WhenPressed(&m_ShooterOn)
         .WhenReleased(&m_ShooterOff);
+        */
 
     /*
         Controle personalizado
@@ -68,18 +71,28 @@ void RobotContainer::ConfigureButtonBindings()
         3 - atira
         4 - muda mira
     */
-    frc2::JoystickButton(&m_operatorController, 3)
-        .WhenPressed(&m_ShooterOn)
-        .WhenReleased(&m_ShooterOff);
-    
-    frc2::JoystickButton(&m_operatorController, 5)
-        .WhenPressed(&m_ConveyorSet);
+    /*Atribuição de botoes para climber
+      um botão para o acionamento normal  
+      um para reverter o climber para a posição inicial
+    */
+
+    frc2::JoystickButton(&m_operatorController, 12)
+        .WhenPressed(&m_ClimberSet)
+        .WhenReleased(&m_ClimberReset);
+    frc2::JoystickButton(&m_operatorController, 8)
+        .WhenPressed(&m_ClimberRevert)
+        .WhenReleased(&m_ClimberReset);
+    //Final do Climber
+
+    /*Atribuição de botoes para Intake
+      um botão para o acionamento normal  
+    */
     frc2::JoystickButton(&m_operatorController, 9)
         .WhenPressed(&m_IntakeSet)
         .WhenReleased(&m_IntakeReset);
-    frc2::JoystickButton(&m_operatorController, 11)
-        .WhenPressed(&m_IntakeSetMotor)
-        .WhenReleased(&m_IntakeResetMotor);
+    //final do Intake
+
+    
 }
 
 frc2::Command *RobotContainer::FinalAutonomousCommand()
@@ -129,7 +142,6 @@ frc2::Command *RobotContainer::FinalAutonomousCommand()
         }, {}),
         //baixo o intake e ligo o conveyor
         m_IntakeSet, 
-        m_ConveyorSet,
         //aguardo 300 ms para os comandos mecanicos funcionarem 
          frc2::InstantCommand([this] {
             static units::second_t timeout = timer.GetFPGATimestamp() + 250_ms;
@@ -169,7 +181,6 @@ frc2::Command *RobotContainer::FinalAutonomousCommand()
             
         },{}),
         //atiro as bolas e faco o balanco do robo para que a segunda bola seja atirada tambem
-        m_ShooterOn, 
         frc2::InstantCommand([this] {
            uint8_t throwRepeater = 0;
             m_drive.ResetEncoders();
@@ -183,15 +194,6 @@ frc2::Command *RobotContainer::FinalAutonomousCommand()
                 
             }
         },{}),
-        //desligo o shooter, vou para a ultima
-        m_ShooterOff,
-        //vou coletar a ultima bola, entaõ reseto a odometria, ligo o intake e o conveyor
-        frc2::InstantCommand([this] { m_drive.ResetOdometry(frc::Pose2d(0_m, 0_m, frc::Rotation2d(0_deg))); }, {}), 
-        m_IntakeSet, 
-        m_ConveyorSet, 
-        std::move(ramseteCommand2),
-        frc2::InstantCommand([this] { m_drive.TankDriveVolts(0_V, 0_V); }, {}), 
-        //depois de coletar recolho  o intake e retorno para a posição de tiro
         frc2::InstantCommand([this] {
             m_drive.ResetEncoders();
             while (m_drive.GetAverageEncoderDistance()>-0.3)
@@ -199,8 +201,6 @@ frc2::Command *RobotContainer::FinalAutonomousCommand()
                 
          
              },{}),
-        //atiro a ultima bola, balancando o robo para que a mesma entre no conveyor
-        m_ShooterOn,
         frc2::InstantCommand([this] {
             uint8_t throwRepeater = 0;
             m_drive.ResetEncoders();
@@ -211,7 +211,5 @@ frc2::Command *RobotContainer::FinalAutonomousCommand()
                 while (m_drive.GetAverageEncoderDistance()<0)
                     m_drive.TankDriveVolts(3_V, 3_V);
                 
-            }  },{}),
-        //desativo os sistemas para economia de bateria
-        m_ShooterOff);
+            }  },{}));
 }

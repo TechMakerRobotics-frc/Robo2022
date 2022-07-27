@@ -17,7 +17,7 @@
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
 #include "subsystems/ShooterSubsystem.h"
-
+#include "subsystems/ClimberSubsystem.h"
 #include <frc/trajectory/TrajectoryUtil.h>
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -33,47 +33,49 @@ public:
 
   frc2::Command *FinalAutonomousCommand();
 
-
   // The chooser for the autonomous routines
   DriveSubsystem m_drive;
   ShooterSubsystem m_shooter;
+  ClimberSubsystem m_climber;
 
 private:
   // The driver's controller
   frc::XboxController m_driverController{OIConstants::kDriverControllerPort};
   frc::Joystick m_operatorController{OIConstants::kOperatorControllerPort};
   frc::Timer timer;
-
-  // The robot's subsystems and commands are defined here...
-  frc2::Command *m_HomeCommand = nullptr;
-  frc2::Command *Home();
-
+  frc2::Command *m_IntakeCommand = nullptr;
+  
   // The robot's subsystems
 
-  frc2::InstantCommand m_driveHalfSpeed{[this] { m_drive.SetMaxOutput(0.7); },
-                                        {}};
-  frc2::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); },
-                                        {}};
-  frc2::InstantCommand m_TargetToggle{[this] { m_shooter.ToggleTarget(); },
-                                      {}};
-  frc2::InstantCommand m_IntakeToggle{[this] { m_shooter.ToggleIntake(); },
-                                      {}};
-  frc2::InstantCommand m_IntakeSet{[this] { m_shooter.SetIntake(1, 0); },
-                                   {}};
-  frc2::InstantCommand m_IntakeReset{[this] { m_shooter.SetIntake(0, 0); },
-                                     {}};
-  frc2::InstantCommand m_IntakeSetMotor{[this] { m_shooter.SetIntake(1, 1); },
-                                     {}};
-  frc2::InstantCommand m_IntakeResetMotor{[this] { m_shooter.SetIntake(0, 1); },
-                                     {}};
-  frc2::InstantCommand m_ConveyorSet{[this] { m_shooter.SetConveyor(-1); },
-                                     {}};
-  frc2::InstantCommand m_ShooterOn{[this] { m_shooter.Shoot(true); },
-                                   {}};
-  frc2::InstantCommand m_ShooterOff{[this] { m_shooter.Shoot(false); },
+  // Comandos para o climber
+  frc2::InstantCommand m_ClimberSet{[this]
+                                    { m_climber.setCllimber(1); },
                                     {}};
-  frc2::InstantCommand m_Home{[this] {  m_HomeCommand = Home(); if (m_HomeCommand != nullptr) m_HomeCommand->Schedule(); },
-                              {}};
+  frc2::InstantCommand m_ClimberRevert{[this]
+                                       { m_climber.setCllimber(-1); },
+                                       {}};
+  frc2::InstantCommand m_ClimberReset{[this]
+                                      { m_climber.setCllimber(0); },
+                                      {}};
+  // Final do Climber
+
+  // Comandos para o Intake
+  frc2::InstantCommand m_IntakeSet{[this]
+                                   {
+                                     m_IntakeCommand = m_shooter.SetIntake();
+                                     if (m_IntakeCommand != nullptr)
+                                       m_IntakeCommand->Schedule();
+                                   },
+                                   {}};
+  frc2::InstantCommand m_IntakeReset{[this]
+                                     {
+                                       m_IntakeCommand = m_shooter.ResetIntake();
+                                       if (m_IntakeCommand != nullptr)
+                                         m_IntakeCommand->Schedule();
+                                     },
+                                     {}};
+  // Final do Intake
+
   // The chooser for the autonomous routines
 
   void ConfigureButtonBindings();
