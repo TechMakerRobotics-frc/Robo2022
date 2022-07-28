@@ -42,11 +42,8 @@ Projeto do Robo da Techmaker Robotics 2022 - Cargo Connect
 |6|7|Mira|
 
 **Cor**
-|Endereço|Função|
-|-|-|
-|Analog 0|Vermelho|
-|Analog 1|Azul|
-|Analog 2|Verde|
+
+Via Serial com Arduino
 
 ## Controles <a name = "controls"></a>
 
