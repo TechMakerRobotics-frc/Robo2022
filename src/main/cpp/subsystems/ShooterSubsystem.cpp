@@ -11,6 +11,7 @@
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/WaitCommand.h>
 
+
 using namespace ShooterConstants;
 ShooterSubsystem::ShooterSubsystem()
     : m_left{kLeftMotorPort},
@@ -33,6 +34,7 @@ ShooterSubsystem::ShooterSubsystem()
 
   ResetEncoders();
 }
+
 void ShooterSubsystem::ResetEncoders()
 {
   m_ShooterEncoder.Reset();
@@ -40,41 +42,55 @@ void ShooterSubsystem::ResetEncoders()
 }
 frc2::Command *ShooterSubsystem::SetIntake()
 {
-    return new frc2::SequentialCommandGroup(
-        frc2::InstantCommand([this] { m_intake.Set(1); }, {}),
-        frc2::InstantCommand([this] { m_conveyor.Set(1); }, {}),
-        frc2::InstantCommand([this] { intake.Set(intake.kForward); }, {}),
-        frc2::WaitCommand(200_ms),
-        frc2::InstantCommand([this] { intake.Set(intake.kOff); }, {})
-        );
+  return new frc2::SequentialCommandGroup(
+      frc2::InstantCommand([this]
+                           { m_intake.Set(1); },
+                           {}),
+      frc2::InstantCommand([this]
+                           { m_conveyor.Set(1); },
+                           {}),
+      frc2::InstantCommand([this]
+                           { intake.Set(intake.kForward); },
+                           {}),
+      frc2::WaitCommand(200_ms),
+      frc2::InstantCommand([this]
+                           { intake.Set(intake.kOff); },
+                           {}));
 }
 
-frc2::Command *ShooterSubsystem::ResetIntake() 
+frc2::Command *ShooterSubsystem::ResetIntake()
 {
   return new frc2::SequentialCommandGroup(
-        frc2::InstantCommand([this] { m_intake.Set(0); }, {}),
-        frc2::InstantCommand([this] { m_conveyor.Set(0); }, {}),
-        frc2::InstantCommand([this] { intake.Set(intake.kReverse); }, {}),
-        frc2::WaitCommand(200_ms),
-        frc2::InstantCommand([this] { intake.Set(intake.kOff); }, {})
-        );
+      frc2::InstantCommand([this]
+                           { m_intake.Set(0); },
+                           {}),
+      frc2::InstantCommand([this]
+                           { m_conveyor.Set(0); },
+                           {}),
+      frc2::InstantCommand([this]
+                           { intake.Set(intake.kReverse); },
+                           {}),
+      frc2::WaitCommand(200_ms),
+      frc2::InstantCommand([this]
+                           { intake.Set(intake.kOff); },
+                           {}));
 }
-
-
-void ShooterSubsystem::Shoot(bool act)
-{
-}
-
 void ShooterSubsystem::SetConveyor(double speed)
 {
+  m_conveyor.Set(speed);
+  m_intake.Set(speed);
 }
 
-void ShooterSubsystem::ToggleTarget()
+void ShooterSubsystem::SetTrigger(double speed)
 {
+  m_conveyor.Set(speed);
+  m_trigger.Set(speed);
 }
 
-void ShooterSubsystem::ToggleIntake()
+void ShooterSubsystem::SetAim(double position)
 {
+  
+  
 }
 
 void ShooterSubsystem::SetCompressor(bool state)

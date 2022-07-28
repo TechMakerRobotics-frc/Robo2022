@@ -87,14 +87,21 @@ constexpr double kMaxSpeedIntake = 0.2;
 constexpr int kEncoderCPR = 8192;
 constexpr double kWheelDiameterInches = 6;
 constexpr double kEncoderDistancePerPulse = 0.48/2048.;
-}  // namespace DriveConstants
+}  // namespace ShooterConstants
 
 namespace ClimberConstants{
 constexpr int kClimberMotorPort = 2;
-}
+}   // namespace ClimberConstants
 namespace OIConstants {
 constexpr int kDriverControllerPort = 0;
 constexpr int kOperatorControllerPort = 1;
 
- 
+constexpr int kShooterAimButton = 1;
+constexpr int kTriggerButton = 2;
+constexpr int kConveyorButton = 5;
+constexpr int kConveyorRevetButton = 6;
+constexpr int kClimberRevertButton = 8;
+constexpr int kIntakeButton = 9;
+constexpr int kClimberButton = 12;
+
 }  // namespace OIConstants

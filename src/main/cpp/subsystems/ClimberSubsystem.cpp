@@ -14,6 +14,6 @@ ClimberSubsystem::ClimberSubsystem()
   
 }
 
-void ClimberSubsystem::setCllimber(double speed){
+void ClimberSubsystem::SetClimber(double speed){
   m_climber.Set(speed);
 }

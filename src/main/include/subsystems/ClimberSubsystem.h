@@ -29,7 +29,7 @@ class ClimberSubsystem : public frc2::SubsystemBase {
 
   // Subsystem methods go here.
 
-  void setCllimber(double speed);
+  void SetClimber(double speed);
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be

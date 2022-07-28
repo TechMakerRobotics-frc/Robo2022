@@ -19,6 +19,7 @@
 #include "subsystems/ShooterSubsystem.h"
 #include "subsystems/ClimberSubsystem.h"
 #include <frc/trajectory/TrajectoryUtil.h>
+#include <frc/SerialPort.h>
 /**
  * This class is where the bulk of the robot should be declared.  Since
  * Command-based is a "declarative" paradigm, very little robot logic should
@@ -44,18 +45,19 @@ private:
   frc::Joystick m_operatorController{OIConstants::kOperatorControllerPort};
   frc::Timer timer;
   frc2::Command *m_IntakeCommand = nullptr;
-  
+  void AimTarget();
+  frc::SerialPort serial;
   // The robot's subsystems
 
   // Comandos para o climber
   frc2::InstantCommand m_ClimberSet{[this]
-                                    { m_climber.setCllimber(1); },
+                                    { m_climber.SetClimber(1); },
                                     {}};
   frc2::InstantCommand m_ClimberRevert{[this]
-                                       { m_climber.setCllimber(-1); },
+                                       { m_climber.SetClimber(-1); },
                                        {}};
   frc2::InstantCommand m_ClimberReset{[this]
-                                      { m_climber.setCllimber(0); },
+                                      { m_climber.SetClimber(0); },
                                       {}};
   // Final do Climber
 
@@ -75,6 +77,32 @@ private:
                                      },
                                      {}};
   // Final do Intake
+
+  // Comandos para o Conveyor
+  frc2::InstantCommand m_ConveyorSet{[this]
+                                     { m_shooter.SetConveyor(1); },
+                                     {}};
+  frc2::InstantCommand m_ConveyorReset{[this]
+                                       { m_shooter.SetConveyor(0); },
+                                       {}};
+  frc2::InstantCommand m_ConveyorRevert{[this]
+                                        { m_shooter.SetConveyor(-1); },
+                                        {}};
+  // Final do Conveyor
+
+  // Comandos para o shooter
+  frc2::InstantCommand m_TriggerSet{[this]
+                                    { m_shooter.SetTrigger(1); },
+                                    {}};
+  frc2::InstantCommand m_TriggerReset{[this]
+                                      { m_shooter.SetTrigger(0); },
+                                      {}};
+  frc2::InstantCommand m_AimTarget{[this]
+                                   {
+                                     AimTarget();
+                                   },
+                                   {}};
+  // Final do shooter
 
   // The chooser for the autonomous routines
 

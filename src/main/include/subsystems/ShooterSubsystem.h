@@ -40,9 +40,9 @@ class ShooterSubsystem : public frc2::SubsystemBase {
   frc2::Command *SetIntake();
   frc2::Command *ResetIntake();
 
-  void Shoot(bool act);
+  void SetTrigger(double speed);
   void SetConveyor(double speed);
-  void ToggleTarget();
+  void SetAim(double position);
 
   void ToggleIntake();
   void SetCompressor(bool state);
