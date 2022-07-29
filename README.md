@@ -1,7 +1,7 @@
 ## TECHMAKER ROBOTICS 2022
 
 # Projeto
-Projeto do Robo da Techmaker Robotics 2022 - Cargo Connect
+Projeto do Robo da Techmaker Robotics 2022 - Rapid React
 ## Itens
 
 - [Projeto](#projeto)
