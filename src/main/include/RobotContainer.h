@@ -33,12 +33,12 @@ public:
   RobotContainer();
 
   frc2::Command *FinalAutonomousCommand();
-
+  frc2::Command *GetAutonomousCommand();
   // The chooser for the autonomous routines
   DriveSubsystem m_drive;
   ShooterSubsystem m_shooter;
   ClimberSubsystem m_climber;
-
+  void Periodic();
 private:
   // The driver's controller
   frc::XboxController m_driverController{OIConstants::kDriverControllerPort};
@@ -102,9 +102,28 @@ private:
                                      AimTarget();
                                    },
                                    {}};
+  frc2::InstantCommand m_ShooterOn{[this]
+                                   {
+                                     m_shooter.SetShooter(1);
+                                   },
+                                   {}};
+  frc2::InstantCommand m_ShooterOff{[this]
+                                   {
+                                     m_shooter.SetShooter(0);
+                                   },
+                                   {}};
   // Final do shooter
 
   // The chooser for the autonomous routines
+  // The autonomous routines
+  frc2::Command *m_simpleAuto = nullptr;
+  frc2::Command *m_safetyAuto = nullptr;
+  frc2::Command *m_seekAndShootAuto = nullptr;  
+
+  // The chooser for the autonomous routines
+  frc::SendableChooser<frc2::Command*> m_chooser;
 
   void ConfigureButtonBindings();
+
+
 };

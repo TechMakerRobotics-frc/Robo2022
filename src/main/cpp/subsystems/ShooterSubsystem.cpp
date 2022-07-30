@@ -11,7 +11,6 @@
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/WaitCommand.h>
 
-
 using namespace ShooterConstants;
 ShooterSubsystem::ShooterSubsystem()
     : m_left{kLeftMotorPort},
@@ -26,6 +25,7 @@ ShooterSubsystem::ShooterSubsystem()
       m_AimEncoder{kAimEncoderPorts[0], kAimEncoderPorts[1], false, frc::Encoder::k1X}
 {
   m_conveyor.SetInverted(true);
+  m_left.SetInverted(true);
   // Set the distance per pulse for the encoders
   m_ShooterEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_AimEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
@@ -52,7 +52,7 @@ frc2::Command *ShooterSubsystem::SetIntake()
       frc2::InstantCommand([this]
                            { intake.Set(intake.kForward); },
                            {}),
-      frc2::WaitCommand(200_ms),
+      frc2::WaitCommand(5_s),
       frc2::InstantCommand([this]
                            { intake.Set(intake.kOff); },
                            {}));
@@ -70,7 +70,7 @@ frc2::Command *ShooterSubsystem::ResetIntake()
       frc2::InstantCommand([this]
                            { intake.Set(intake.kReverse); },
                            {}),
-      frc2::WaitCommand(200_ms),
+      frc2::WaitCommand(5_s),
       frc2::InstantCommand([this]
                            { intake.Set(intake.kOff); },
                            {}));
@@ -90,27 +90,23 @@ void ShooterSubsystem::SetTrigger(double speed)
 void ShooterSubsystem::SetAim(double position)
 {
   double speed = 0;
-  if(m_AimEncoder.GetDistance()>position)
+  if (m_AimEncoder.GetDistance() > position)
     speed = 0.5;
-  else if(m_AimEncoder.GetDistance()<position)
+  else if (m_AimEncoder.GetDistance() < position)
     speed = -0.5;
-  while (m_AimEncoder.GetDistance()!=position)
+  while (m_AimEncoder.GetDistance() != position)
   {
     m_aim.Set(speed);
   }
-  
-  
 }
 
 void ShooterSubsystem::SetShooter(double speed)
 {
   m_motors.Set(speed);
-  
 }
 double ShooterSubsystem::GetShooter()
 {
   return m_ShooterEncoder.GetRate();
-  
 }
 void ShooterSubsystem::SetCompressor(bool state)
 {

@@ -28,7 +28,16 @@
 #include "networktables/NetworkTableValue.h"
 #include "wpi/span.h"
 #include <frc/SerialPort.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
+double targetOffsetAngle_Horizontal;
+double targetOffsetAngle_Vertical;
+double targetArea;
+double targetSkew;
+
+double angleToGoalDegrees;
+double angleToGoalRadians;
+double distanceFromLimelightToGoal;
 using namespace OIConstants;
 RobotContainer::RobotContainer() : serial{115200, frc::SerialPort::Port::kOnboard, 8, frc::SerialPort::Parity::kParity_None, frc::SerialPort::StopBits::kStopBits_One}
 {
@@ -42,25 +51,57 @@ RobotContainer::RobotContainer() : serial{115200, frc::SerialPort::Port::kOnboar
         [this]
         {
             m_drive.ArcadeDrive(-m_driverController.GetLeftY(),
-                                m_driverController.GetRightX() * 0.8);
+                                m_driverController.GetRightX());
         },
         {&m_drive}));
-    // frc::CameraServer::StartAutomaticCapture();
-    //  Add commands to the autonomous command chooser
+
+    frc::CameraServer::GetInstance()->StartAutomaticCapture();
+        // Add commands to the autonomous command chooser
+    m_chooser.SetDefaultOption("Autonomo Simples - TARMAK 2", m_simpleAuto);
+    m_chooser.AddOption("Autonomo Seguro - TARMAK 4", m_safetyAuto);
+    m_chooser.AddOption("Autonomo Seek'n'Shoot - TARMAK 1", m_seekAndShootAuto);
+
+    // Put the chooser on the dashboard
+    frc::SmartDashboard::PutData(&m_chooser);
+
+
+}
+frc2::Command* RobotContainer::GetAutonomousCommand() {
+  // Runs the chosen command in autonomous
+  return m_chooser.GetSelected();
+}
+void RobotContainer::Periodic()
+{
+
+    std::shared_ptr<nt::NetworkTable> table = nt::NetworkTableInstance::GetDefault().GetTable("limelight");
+    targetOffsetAngle_Horizontal = table->GetNumber("tx", 0.0);
+    targetOffsetAngle_Vertical = table->GetNumber("ty", 0.0);
+    targetArea = table->GetNumber("ta", 0.0);
+    targetSkew = table->GetNumber("ts", 0.0);
+    angleToGoalDegrees = limelightMountAngleDegrees + targetOffsetAngle_Vertical;
+    angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
+
+    // calculate distance
+    distanceFromLimelightToGoal = (goalHeight - limelightLensHeight) / tan(angleToGoalRadians);
+    frc::SmartDashboard::PutNumber("Alvo - Angulo Horizontal", targetOffsetAngle_Horizontal);
+    frc::SmartDashboard::PutNumber("Alvo - Angulo Vertical", targetOffsetAngle_Vertical);
+    frc::SmartDashboard::PutNumber("Area do Alvo", targetArea);
+    frc::SmartDashboard::PutNumber("Angulo para o Alvo", angleToGoalDegrees);
+    frc::SmartDashboard::PutNumber("Distancia para o Alvo", distanceFromLimelightToGoal);
 }
 
 void RobotContainer::ConfigureButtonBindings()
 {
 
-    /*
+    
     //Os comandos do Joystick foram desabilitados para evitar acionamentos por acidentes
-    frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kRightBumper)
-        .WhenReleased(&m_driveFullSpeed)
-        .WhenPressed(&m_driveHalfSpeed);
     frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kA)
+        .WhenPressed(&m_IntakeSet)
+        .WhenReleased(&m_IntakeReset);
+    frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kB)
         .WhenPressed(&m_ShooterOn)
         .WhenReleased(&m_ShooterOff);
-        */
+        
 
     /*
         Controle personalizado
@@ -128,29 +169,9 @@ void RobotContainer::AimTarget()
     float Kp = -0.1f;
     float min_command = 0.05f;
 
-    std::shared_ptr<nt::NetworkTable> table = nt::NetworkTableInstance::GetDefault().GetTable("limelight");
-    double targetOffsetAngle_Horizontal = table->GetNumber("tx", 0.0);
-    double targetOffsetAngle_Vertical = table->GetNumber("ty", 0.0);
-    double targetArea = table->GetNumber("ta", 0.0);
-    double targetSkew = table->GetNumber("ts", 0.0);
-    double targetOffsetAngle_Vertical = table->GetNumber("ty",0.0);
 
-    // how many degrees back is your limelight rotated from perfectly vertical?
-    double limelightMountAngleDegrees = 30.0;
-
-    // distance from the center of the Limelight lens to the floor
-    double limelightLensHeight = 0.50;
-
-    // distance from the target to the floor
-    double goalHeight = 2.64;
-
-    double angleToGoalDegrees = limelightMountAngleDegrees + targetOffsetAngle_Vertical;
-    double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
-
-    //calculate distance
-    double distanceFromLimelightToGoal = (goalHeight - limelightLensHeight)/tan(angleToGoalRadians);
-    m_shooter.SetShooter(distanceFromLimelightToGoal/10);
-    float tx = table->GetNumber("tx", 0.0);
+    m_shooter.SetShooter(distanceFromLimelightToGoal / 10);
+    float tx = targetOffsetAngle_Horizontal;
     float heading_error = -tx;
     float steering_adjust = 0.0f;
     if (tx > 1.0)
@@ -161,11 +182,11 @@ void RobotContainer::AimTarget()
     {
         steering_adjust = Kp * heading_error + min_command;
     }
-    m_drive.TankDrive(steering_adjust,-steering_adjust);
+    m_drive.TankDrive(steering_adjust, -steering_adjust);
     // left_command += steering_adjust;
     // right_command -= steering_adjust;
 }
 frc2::Command *RobotContainer::FinalAutonomousCommand()
 {
-   return NULL;
+    return NULL;
 }

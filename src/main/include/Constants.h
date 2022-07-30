@@ -96,6 +96,10 @@ namespace OIConstants {
 constexpr int kDriverControllerPort = 0;
 constexpr int kOperatorControllerPort = 1;
 
+constexpr double limelightMountAngleDegrees = 30.0;
+constexpr double limelightLensHeight = 0.50;
+constexpr double goalHeight = 2.64;
+
 constexpr int kShooterAimButton = 1;
 constexpr int kTriggerButton = 2;
 constexpr int kConveyorButton = 5;
