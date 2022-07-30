@@ -46,6 +46,8 @@ class ShooterSubsystem : public frc2::SubsystemBase {
 
   void ToggleIntake();
   void SetCompressor(bool state);
+  void SetShooter(double speed);
+  double GetShooter();
 
 
  private:
@@ -58,6 +60,7 @@ class ShooterSubsystem : public frc2::SubsystemBase {
   WPI_VictorSPX m_right;
   WPI_VictorSPX m_conveyor;
   WPI_VictorSPX m_intake;
+  WPI_VictorSPX m_aim;
   
   frc::Encoder m_ShooterEncoder;
 

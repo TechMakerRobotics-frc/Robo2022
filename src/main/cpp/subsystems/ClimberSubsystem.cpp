@@ -4,8 +4,6 @@
 
 #include "subsystems/ClimberSubsystem.h"
 
-#include <frc/geometry/Rotation2d.h>
-#include <frc/kinematics/DifferentialDriveWheelSpeeds.h>
 
 using namespace ClimberConstants;
 ClimberSubsystem::ClimberSubsystem()
@@ -13,7 +11,9 @@ ClimberSubsystem::ClimberSubsystem()
 {
   
 }
-
+void ClimberSubsystem::Periodic()
+{
+}
 void ClimberSubsystem::SetClimber(double speed){
   m_climber.Set(speed);
 }

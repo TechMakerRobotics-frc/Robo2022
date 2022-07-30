@@ -133,7 +133,23 @@ void RobotContainer::AimTarget()
     double targetOffsetAngle_Vertical = table->GetNumber("ty", 0.0);
     double targetArea = table->GetNumber("ta", 0.0);
     double targetSkew = table->GetNumber("ts", 0.0);
+    double targetOffsetAngle_Vertical = table->GetNumber("ty",0.0);
 
+    // how many degrees back is your limelight rotated from perfectly vertical?
+    double limelightMountAngleDegrees = 30.0;
+
+    // distance from the center of the Limelight lens to the floor
+    double limelightLensHeight = 0.50;
+
+    // distance from the target to the floor
+    double goalHeight = 2.64;
+
+    double angleToGoalDegrees = limelightMountAngleDegrees + targetOffsetAngle_Vertical;
+    double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
+
+    //calculate distance
+    double distanceFromLimelightToGoal = (goalHeight - limelightLensHeight)/tan(angleToGoalRadians);
+    m_shooter.SetShooter(distanceFromLimelightToGoal/10);
     float tx = table->GetNumber("tx", 0.0);
     float heading_error = -tx;
     float steering_adjust = 0.0f;
@@ -145,132 +161,11 @@ void RobotContainer::AimTarget()
     {
         steering_adjust = Kp * heading_error + min_command;
     }
+    m_drive.TankDrive(steering_adjust,-steering_adjust);
     // left_command += steering_adjust;
     // right_command -= steering_adjust;
 }
 frc2::Command *RobotContainer::FinalAutonomousCommand()
 {
-    // Create a voltage constraint to ensure we don't accelerate too fast
-    frc::DifferentialDriveVoltageConstraint autoVoltageConstraint(
-        frc::SimpleMotorFeedforward<units::meters>(
-            DriveConstants::ks, DriveConstants::kv, DriveConstants::ka),
-        DriveConstants::kDriveKinematics, 10_V);
-
-    // Set up config for trajectory
-    frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
-                                 AutoConstants::kMaxAcceleration);
-    // Add kinematics to ensure max speed is actually obeyed
-    config.SetKinematics(DriveConstants::kDriveKinematics);
-    // Apply the voltage constraint
-    config.AddConstraint(autoVoltageConstraint);
-
-    auto Trajectory2 = frc::TrajectoryGenerator::GenerateTrajectory(
-        frc::Pose2d(0_m, 0_m, frc::Rotation2d(0_deg)),
-        {},
-        frc::Pose2d(0.5_m, 0_m, frc::Rotation2d(0_deg)),
-        config);
-
-    frc2::RamseteCommand ramseteCommand2(
-        Trajectory2, [this]()
-        { return m_drive.GetPose(); },
-        frc::RamseteController(AutoConstants::kRamseteB,
-                               AutoConstants::kRamseteZeta),
-        frc::SimpleMotorFeedforward<units::meters>(
-            DriveConstants::ks, DriveConstants::kv, DriveConstants::ka),
-        DriveConstants::kDriveKinematics,
-        [this]
-        { return m_drive.GetWheelSpeeds(); },
-        frc2::PIDController(DriveConstants::kPDriveVel, DriveConstants::kIDriveVel, DriveConstants::kDDriveVel),
-        frc2::PIDController(DriveConstants::kPDriveVel, DriveConstants::kIDriveVel, DriveConstants::kDDriveVel),
-        [this](auto left, auto right)
-        { m_drive.TankDriveVolts(left, right); },
-        {&m_drive});
-
-    return new frc2::SequentialCommandGroup(
-        // ligo o compressor
-        frc2::InstantCommand([this]
-                             { m_shooter.SetCompressor(1); },
-                             {}),
-        // aguardo 2 segundos para pressurizar e baixar o intake
-        frc2::InstantCommand([this]
-                             {
-            static units::second_t timeout = timer.GetFPGATimestamp() + 1_s;
-            while (timer.GetFPGATimestamp() < timeout)
-                m_drive.TankDriveVolts(0_V, 0_V); },
-                             {}),
-        // baixo o intake e ligo o conveyor
-        m_IntakeSet,
-        // aguardo 300 ms para os comandos mecanicos funcionarem
-        frc2::InstantCommand([this]
-                             {
-            static units::second_t timeout = timer.GetFPGATimestamp() + 250_ms;
-            while (timer.GetFPGATimestamp() < timeout)
-                m_drive.TankDriveVolts(0_V, 0_V); },
-                             {}),
-        // faço a jogada de balanco para ajustar a primeira bola no conveyor
-        frc2::InstantCommand([this]
-                             {
-            uint8_t throwRepeater = 0;
-            m_drive.ResetEncoders();
-            for (throwRepeater = 0; throwRepeater < 3; throwRepeater++)
-            {
-                while (m_drive.GetAverageEncoderDistance()>-0.1)
-                    m_drive.TankDriveVolts(-3_V, -3_V);
-                while (m_drive.GetAverageEncoderDistance()<0)
-                    m_drive.TankDriveVolts(3_V, 3_V);
-                
-            } },
-                             {}),
-        // paro de atuar o conveyor para não afogar com as bolas
-        // me desloco 1m para coletar a segunda bola e ficar em posição de tiro
-        frc2::InstantCommand([this]
-                             {
-                                 m_drive.ResetEncoders();
-                                 while (m_drive.GetAverageEncoderDistance() < 1)
-                                 {
-                                     m_drive.TankDriveVolts(4_V, 4_V);
-                                 } },
-                             {}),
-        // aciono o rotor do shooter e aguardo 250ms para que esteja na aceleração maxima
-        frc2::InstantCommand([this]
-                             {
-                                 static units::second_t timeout = timer.GetFPGATimestamp() + 250_ms;
-
-                                 while (timer.GetFPGATimestamp() < timeout)
-                                     m_drive.TankDriveVolts(0_V, 0_V); },
-                             {}),
-        // atiro as bolas e faco o balanco do robo para que a segunda bola seja atirada tambem
-        frc2::InstantCommand([this]
-                             {
-           uint8_t throwRepeater = 0;
-            m_drive.ResetEncoders();
-            for (throwRepeater = 0; throwRepeater < 3; throwRepeater++)
-            {
-                while (m_drive.GetAverageEncoderDistance()<0.1)
-                    m_drive.TankDriveVolts(3_V, 3_V);
-                while (m_drive.GetAverageEncoderDistance()>0)
-                    m_drive.TankDriveVolts(-3_V, -3_V);
-                
-                
-            } },
-                             {}),
-        frc2::InstantCommand([this]
-                             {
-                                 m_drive.ResetEncoders();
-                                 while (m_drive.GetAverageEncoderDistance() > -0.3)
-                                     m_drive.TankDriveVolts(-4_V, -4_V); },
-                             {}),
-        frc2::InstantCommand([this]
-                             {
-            uint8_t throwRepeater = 0;
-            m_drive.ResetEncoders();
-            for (throwRepeater = 0; throwRepeater < 3; throwRepeater++)
-            {
-                while (m_drive.GetAverageEncoderDistance()>-0.1)
-                    m_drive.TankDriveVolts(-3_V, -3_V);
-                while (m_drive.GetAverageEncoderDistance()<0)
-                    m_drive.TankDriveVolts(3_V, 3_V);
-                
-            } },
-                             {}));
+   return NULL;
 }

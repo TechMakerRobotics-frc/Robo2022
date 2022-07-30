@@ -48,6 +48,11 @@ void DriveSubsystem::ArcadeDrive(double fwd, double rot) {
   m_drive.ArcadeDrive(fwd, rot);
 }
 
+void DriveSubsystem::TankDrive(double left, double right) {
+  m_leftMotors.Set(left);
+  m_rightMotors.Set(-right);
+  m_drive.Feed();
+}
 void DriveSubsystem::TankDriveVolts(units::volt_t left, units::volt_t right) {
   m_leftMotors.SetVoltage(left);
   m_rightMotors.SetVoltage(-right);
