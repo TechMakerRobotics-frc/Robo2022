@@ -56,6 +56,7 @@ RobotContainer::RobotContainer() : serial{115200, frc::SerialPort::Port::kOnboar
         {&m_drive}));
 
     frc::CameraServer::GetInstance()->StartAutomaticCapture();
+    frc::CameraServer::G
         // Add commands to the autonomous command chooser
     m_chooser.SetDefaultOption("Autonomo Simples - TARMAK 2", m_simpleAuto);
     m_chooser.AddOption("Autonomo Seguro - TARMAK 4", m_safetyAuto);
