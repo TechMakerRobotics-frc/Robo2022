@@ -25,12 +25,13 @@ ShooterSubsystem::ShooterSubsystem()
       m_AimEncoder{kAimEncoderPorts[0], kAimEncoderPorts[1], false, frc::Encoder::k1X}
 {
   m_conveyor.SetInverted(true);
-  m_left.SetInverted(true);
+  m_right.SetInverted(true);
   // Set the distance per pulse for the encoders
   m_ShooterEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_AimEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_ShooterEncoder.SetSamplesToAverage(10);
   m_AimEncoder.SetSamplesToAverage(10);
+  m_trigger.SetInverted(true);
 
   ResetEncoders();
 }
@@ -43,12 +44,12 @@ void ShooterSubsystem::ResetEncoders()
 frc2::Command *ShooterSubsystem::SetIntake()
 {
   return new frc2::SequentialCommandGroup(
-      frc2::InstantCommand([this]
-                           { m_intake.Set(1); },
+      /*frc2::InstantCommand([this]
+                           { m_intake.Set(0.5); },
                            {}),
       frc2::InstantCommand([this]
                            { m_conveyor.Set(1); },
-                           {}),
+                           {}),*/
       frc2::InstantCommand([this]
                            { intake.Set(intake.kForward); },
                            {}),
