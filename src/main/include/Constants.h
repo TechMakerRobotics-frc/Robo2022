@@ -78,8 +78,8 @@ constexpr int kShooterEncoderPorts[]{4,5};
 constexpr int kAimEncoderPorts[]{6,7};
 
 
-constexpr int kIntakeUp = 0;
-constexpr int kIntakeDown = 1;
+constexpr int kIntakeUp = 1;
+constexpr int kIntakeDown = 0;
 
 constexpr int kMaxSpeed = 1;
 constexpr double kMaxSpeedIntake = 0.2;

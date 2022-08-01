@@ -50,13 +50,12 @@ RobotContainer::RobotContainer() : serial{115200, frc::SerialPort::Port::kOnboar
     m_drive.SetDefaultCommand(frc2::RunCommand(
         [this]
         {
-            m_drive.ArcadeDrive(-m_driverController.GetLeftY(),
-                                m_driverController.GetRightX());
+            m_drive.ArcadeDrive(m_driverController.GetRightX(),
+                                -m_driverController.GetLeftY());
         },
         {&m_drive}));
 
     frc::CameraServer::GetInstance()->StartAutomaticCapture();
-    frc::CameraServer::G
         // Add commands to the autonomous command chooser
     m_chooser.SetDefaultOption("Autonomo Simples - TARMAK 2", m_simpleAuto);
     m_chooser.AddOption("Autonomo Seguro - TARMAK 4", m_safetyAuto);
@@ -96,12 +95,12 @@ void RobotContainer::ConfigureButtonBindings()
 
     
     //Os comandos do Joystick foram desabilitados para evitar acionamentos por acidentes
-    frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kA)
+    /*frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kA)
         .WhenPressed(&m_IntakeSet)
         .WhenReleased(&m_IntakeReset);
     frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kB)
         .WhenPressed(&m_ShooterOn)
-        .WhenReleased(&m_ShooterOff);
+        .WhenReleased(&m_ShooterOff);*/
         
 
     /*
@@ -163,7 +162,8 @@ void RobotContainer::ConfigureButtonBindings()
         .WhenPressed(&m_TriggerSet)
         .WhenReleased(&m_TriggerReset);
     frc2::JoystickButton(&m_operatorController, kShooterAimButton)
-        .WhenActive(&m_AimTarget);
+        .WhenPressed(&m_ShooterOn)
+        .WhenReleased(&m_ShooterOff);
 }
 void RobotContainer::AimTarget()
 {

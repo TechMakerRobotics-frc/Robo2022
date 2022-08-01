@@ -44,16 +44,16 @@ void ShooterSubsystem::ResetEncoders()
 frc2::Command *ShooterSubsystem::SetIntake()
 {
   return new frc2::SequentialCommandGroup(
-      /*frc2::InstantCommand([this]
+      frc2::InstantCommand([this]
                            { m_intake.Set(0.5); },
                            {}),
       frc2::InstantCommand([this]
                            { m_conveyor.Set(1); },
-                           {}),*/
+                           {}),
       frc2::InstantCommand([this]
                            { intake.Set(intake.kForward); },
                            {}),
-      frc2::WaitCommand(5_s),
+      frc2::WaitCommand(500_ms),
       frc2::InstantCommand([this]
                            { intake.Set(intake.kOff); },
                            {}));
@@ -71,7 +71,7 @@ frc2::Command *ShooterSubsystem::ResetIntake()
       frc2::InstantCommand([this]
                            { intake.Set(intake.kReverse); },
                            {}),
-      frc2::WaitCommand(5_s),
+      frc2::WaitCommand(500_ms),
       frc2::InstantCommand([this]
                            { intake.Set(intake.kOff); },
                            {}));
