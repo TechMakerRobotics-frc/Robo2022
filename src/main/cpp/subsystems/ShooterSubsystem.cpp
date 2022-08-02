@@ -21,15 +21,13 @@ ShooterSubsystem::ShooterSubsystem()
       m_trigger{kTriggerMotorPort, rev::CANSparkMaxLowLevel::MotorType::kBrushless},
       m_aim{kAimMotorPort},
       compressor{frc::PneumaticsModuleType::CTREPCM},
-      m_ShooterEncoder{kShooterEncoderPorts[0], kShooterEncoderPorts[1], false, frc::Encoder::k1X},
       m_AimEncoder{kAimEncoderPorts[0], kAimEncoderPorts[1], false, frc::Encoder::k1X}
 {
   m_conveyor.SetInverted(true);
   m_right.SetInverted(true);
   // Set the distance per pulse for the encoders
-  m_ShooterEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
   m_AimEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
-  m_ShooterEncoder.SetSamplesToAverage(10);
+  
   m_AimEncoder.SetSamplesToAverage(10);
   m_trigger.SetInverted(true);
 
@@ -38,7 +36,6 @@ ShooterSubsystem::ShooterSubsystem()
 
 void ShooterSubsystem::ResetEncoders()
 {
-  m_ShooterEncoder.Reset();
   m_AimEncoder.Reset();
 }
 frc2::Command *ShooterSubsystem::SetIntake()
@@ -105,10 +102,7 @@ void ShooterSubsystem::SetShooter(double speed)
 {
   m_motors.Set(speed);
 }
-double ShooterSubsystem::GetShooter()
-{
-  return m_ShooterEncoder.GetRate();
-}
+
 void ShooterSubsystem::SetCompressor(bool state)
 {
   if (state)

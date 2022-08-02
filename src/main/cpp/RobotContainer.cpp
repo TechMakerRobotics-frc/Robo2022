@@ -52,6 +52,7 @@ RobotContainer::RobotContainer() : serial{115200, frc::SerialPort::Port::kOnboar
         {
             m_drive.ArcadeDrive(m_driverController.GetLeftY(),
                                 -m_driverController.GetRightX());
+
         },
         {&m_drive}));
 
@@ -64,7 +65,7 @@ RobotContainer::RobotContainer() : serial{115200, frc::SerialPort::Port::kOnboar
 
     // Put the chooser on the dashboard
     frc::SmartDashboard::PutData(&m_chooser);
-
+   
 
 }
 frc2::Command* RobotContainer::GetAutonomousCommand() {
@@ -89,6 +90,9 @@ void RobotContainer::Periodic()
     frc::SmartDashboard::PutNumber("Area do Alvo", targetArea);
     frc::SmartDashboard::PutNumber("Angulo para o Alvo", angleToGoalDegrees);
     frc::SmartDashboard::PutNumber("Distancia para o Alvo", distanceFromLimelightToGoal);
+ frc::SmartDashboard::PutNumber("LeftY", m_driverController.GetLeftY());
+    frc::SmartDashboard::PutNumber("RightX", m_driverController.GetRightX());
+
 }
 
 void RobotContainer::ConfigureButtonBindings()
@@ -97,11 +101,11 @@ void RobotContainer::ConfigureButtonBindings()
     
     //Os comandos do Joystick foram desabilitados para evitar acionamentos por acidentes
     frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kA)
-        .WhenPressed(&m_IntakeSet)
-        .WhenReleased(&m_IntakeReset);
+         .WhenPressed(&m_ClimberSet)
+        .WhenReleased(&m_ClimberReset);
     frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kB)
-        .WhenPressed(&m_ShooterOn)
-        .WhenReleased(&m_ShooterOff);
+        .WhenPressed(&m_ClimberRevert)
+        .WhenReleased(&m_ClimberReset);
         
 
     /*
@@ -183,7 +187,7 @@ void RobotContainer::AimTarget()
     {
         steering_adjust = Kp * heading_error + min_command;
     }
-    m_drive.TankDrive(steering_adjust, -steering_adjust);
+    m_drive.ArcadeDrive(0,steering_adjust);
     // left_command += steering_adjust;
     // right_command -= steering_adjust;
 }
