@@ -2,12 +2,11 @@ Relatorio de tarefas 01-08
 
 Realizadas
 1 - Corrigir navegação
+2 - analisar dado limelight
 
 A fazer
 
-2 - analisar dado limelight
 3 - Criar comando de mira
 4 - comando autonomo simples - sair tarmak posição 2, arremassa bola interna, coleta bola na lateral, arremessa bola
 5 - Comando autonomo segunrança - Sair do tarmak na posição 4, tirar cargo adversaria, arremessar bola interna, posiciona proxima a cargo na zona adversaria
 6 - Comando autonomo Seek'n'Shoot - Sair do tarmak na posição 1, arremessar a bola interna, coletar 2 bolas proprias e arremessar
-7 - Comando de mira

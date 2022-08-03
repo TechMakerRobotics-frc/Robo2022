@@ -26,8 +26,8 @@ ShooterSubsystem::ShooterSubsystem()
   m_conveyor.SetInverted(true);
   m_right.SetInverted(true);
   // Set the distance per pulse for the encoders
-  m_AimEncoder.SetDistancePerPulse(kEncoderDistancePerPulse);
-  
+  m_AimEncoder.SetDistancePerPulse(1);
+
   m_AimEncoder.SetSamplesToAverage(10);
   m_trigger.SetInverted(true);
 
@@ -89,13 +89,22 @@ void ShooterSubsystem::SetAim(double position)
 {
   double speed = 0;
   if (m_AimEncoder.GetDistance() > position)
-    speed = 0.5;
-  else if (m_AimEncoder.GetDistance() < position)
-    speed = -0.5;
-  while (m_AimEncoder.GetDistance() != position)
   {
-    m_aim.Set(speed);
+    speed = 0.5;
+    while (m_AimEncoder.GetDistance()> position)
+    {
+      m_aim.Set(speed);
+    }
   }
+  else if (m_AimEncoder.GetDistance() < position){
+    speed = -0.5;
+    while (m_AimEncoder.GetDistance()< position)
+    {
+      m_aim.Set(speed);
+    }
+  }
+
+  m_aim.Set(0);
 }
 
 void ShooterSubsystem::SetShooter(double speed)
@@ -112,4 +121,5 @@ void ShooterSubsystem::SetCompressor(bool state)
 }
 void ShooterSubsystem::Periodic()
 {
+  frc::SmartDashboard::PutNumber("Encoder Mira", m_AimEncoder.GetDistance());
 }

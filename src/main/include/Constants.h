@@ -9,9 +9,10 @@
 #include <units/time.h>
 #include <units/velocity.h>
 #include <units/voltage.h>
+#include <units/angular_velocity.h>
+#include <units/angular_acceleration.h>
 #include <wpi/numbers>
 #include <frc/XboxController.h>
-
 
 #pragma once
 
@@ -61,8 +62,8 @@ constexpr auto kMaxAcceleration = 1_mps_sq;
 
 // Reasonable baseline values for a RAMSETE follower in units of meters and
 // seconds
-constexpr double kRamseteB = 2;
-constexpr double kRamseteZeta = 0.7;
+constexpr auto kRamseteB = 2.0;
+constexpr auto kRamseteZeta = 0.7;
 }  // namespace AutoConstants
 
 

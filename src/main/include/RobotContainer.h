@@ -32,21 +32,22 @@ class RobotContainer
 public:
   RobotContainer();
 
-  frc2::Command *FinalAutonomousCommand();
   frc2::Command *GetAutonomousCommand();
   // The chooser for the autonomous routines
   DriveSubsystem m_drive;
   ShooterSubsystem m_shooter;
   ClimberSubsystem m_climber;
   void Periodic();
+  
 private:
   // The driver's controller
   frc::XboxController m_driverController{OIConstants::kDriverControllerPort};
   frc::Joystick m_operatorController{OIConstants::kOperatorControllerPort};
   frc::Timer timer;
   frc2::Command *m_IntakeCommand = nullptr;
-  void AimTarget();
+  frc2::Command *m_targetCommand = nullptr;
   frc::SerialPort serial;
+  frc2::Command *AimTarget();
   // The robot's subsystems
 
   // Comandos para o climber
@@ -98,10 +99,12 @@ private:
                                       { m_shooter.SetTrigger(0); },
                                       {}};
   frc2::InstantCommand m_AimTarget{[this]
-                                   {
-                                     AimTarget();
-                                   },
-                                   {}};
+                                     {
+                                       m_targetCommand = AimTarget();
+                                       if (m_targetCommand != nullptr)
+                                         m_targetCommand->Schedule();
+                                     },
+                                     {}};
   frc2::InstantCommand m_ShooterOn{[this]
                                    {
                                      m_shooter.SetShooter(1);
@@ -112,16 +115,27 @@ private:
                                      m_shooter.SetShooter(0);
                                    },
                                    {}};
+   frc2::InstantCommand m_AimForward{[this]
+                                    { m_shooter.SetAim(200); },
+                                    {}};
+  frc2::InstantCommand m_AimRewind{[this]
+                                    { m_shooter.SetAim(100); },
+                                    {}};
+  frc2::InstantCommand m_AimReset{[this]
+                                    { m_shooter.SetAim(0); },
+                                    {}};
   // Final do shooter
 
   // The chooser for the autonomous routines
   // The autonomous routines
-  frc2::Command *m_simpleAuto = nullptr;
-  frc2::Command *m_safetyAuto = nullptr;
-  frc2::Command *m_seekAndShootAuto = nullptr;  
+  frc2::Command *p_simpleAuto = nullptr;
+  frc2::Command *p_safetyAuto = nullptr;
+  frc2::Command *p_seekAndShootAuto = nullptr; 
+
+ 
 
   // The chooser for the autonomous routines
-  frc::SendableChooser<frc2::Command*> m_chooser;
+  frc::SendableChooser<int> m_chooser;
 
   void ConfigureButtonBindings();
 
