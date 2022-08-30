@@ -81,14 +81,15 @@ private:
 
   // Comandos para o Conveyor
   frc2::InstantCommand m_ConveyorSet{[this]
-                                     { m_shooter.SetConveyor(1); },
+                                     { m_shooter.SetConveyor(0.5); },
                                      {}};
   frc2::InstantCommand m_ConveyorReset{[this]
                                        { m_shooter.SetConveyor(0); },
                                        {}};
   frc2::InstantCommand m_ConveyorRevert{[this]
-                                        { m_shooter.SetConveyor(-1); },
+                                        { m_shooter.SetConveyor(-0.5); },
                                         {}};
+                                        
   // Final do Conveyor
 
   // Comandos para o shooter
@@ -107,7 +108,7 @@ private:
                                      {}};
   frc2::InstantCommand m_ShooterOn{[this]
                                    {
-                                     m_shooter.SetShooter(1);
+                                     m_shooter.SetShooter(0.7);
                                    },
                                    {}};
   frc2::InstantCommand m_ShooterOff{[this]
@@ -115,7 +116,7 @@ private:
                                      m_shooter.SetShooter(0);
                                    },
                                    {}};
-   frc2::InstantCommand m_AimForward{[this]
+   /*frc2::InstantCommand m_AimForward{[this]
                                     { m_shooter.SetAim(200); },
                                     {}};
   frc2::InstantCommand m_AimRewind{[this]
@@ -123,7 +124,18 @@ private:
                                     {}};
   frc2::InstantCommand m_AimReset{[this]
                                     { m_shooter.SetAim(0); },
+                                    {}};*/
+  frc2::InstantCommand m_AimForward{[this]
+                                    { m_shooter.ActiveAim(1); },
                                     {}};
+  frc2::InstantCommand m_AimRewind{[this]
+                                    { m_shooter.ActiveAim(-1); },
+                                    {}};
+  frc2::InstantCommand m_AimReset{[this]
+                                    { m_shooter.ActiveAim(0); },
+                                    {}};
+  
+  
   // Final do shooter
 
   // The chooser for the autonomous routines
@@ -133,9 +145,6 @@ private:
   frc2::Command *p_seekAndShootAuto = nullptr; 
 
  
-
-  // The chooser for the autonomous routines
-  frc::SendableChooser<int> m_chooser;
 
   void ConfigureButtonBindings();
 

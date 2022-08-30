@@ -102,6 +102,8 @@ constexpr double goalHeight = 2.64;
 
 constexpr int kShooterAimButton = 1;
 constexpr int kTriggerButton = 2;
+constexpr int kAimForwardButton = 3;
+constexpr int kAimRevertButton = 4;
 constexpr int kConveyorButton = 5;
 constexpr int kConveyorRevetButton = 6;
 constexpr int kClimberRevertButton = 8;

@@ -56,17 +56,10 @@ RobotContainer::RobotContainer() : serial{115200, frc::SerialPort::Port::kOnboar
         [this]
         {
             m_drive.ArcadeDrive(m_driverController.GetLeftY(),
-                                -m_driverController.GetRightX());
+                                m_driverController.GetRightX() * 0.75);
         },
         {&m_drive}));
 
-    // Add commands to the autonomous command chooser
-    m_chooser.SetDefaultOption("Autonomo Simples - TARMAK 2", 1);
-    m_chooser.AddOption("Autonomo Seguro - TARMAK 4", 2);
-    m_chooser.AddOption("Autonomo Seek'n'Shoot - TARMAK 1", 3);
-
-    // Put the chooser on the dashboard
-    frc::SmartDashboard::PutData(&m_chooser);
     camera = frc::CameraServer::StartAutomaticCapture();
     camera.SetResolution(640, 480);
     server = frc::CameraServer::GetServer();
@@ -74,216 +67,39 @@ RobotContainer::RobotContainer() : serial{115200, frc::SerialPort::Port::kOnboar
 }
 frc2::Command *RobotContainer::GetAutonomousCommand()
 {
-    if (m_chooser.GetSelected() == 1)
-    {
-        // Create a voltage constraint to ensure we don't accelerate too fast
-        frc::DifferentialDriveVoltageConstraint autoVoltageConstraint(
-            frc::SimpleMotorFeedforward<units::meters>(
-                DriveConstants::ks, DriveConstants::kv, DriveConstants::ka),
-            DriveConstants::kDriveKinematics, 10_V);
 
-        // Set up config for trajectory
-        frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
-                                     AutoConstants::kMaxAcceleration);
-        // Add kinematics to ensure max speed is actually obeyed
-        config.SetKinematics(DriveConstants::kDriveKinematics);
-        // Apply the voltage constraint
-        config.AddConstraint(autoVoltageConstraint);
+    return new frc2::SequentialCommandGroup(
+        // ligo o compressor
+frc2::InstantCommand([this]
+        {
+            static units::second_t timeout = timer.GetFPGATimestamp() + 2_s;
 
-        auto Trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-            frc::Pose2d(0_m, 0_m, frc::Rotation2d(0_deg)),
-            {},
-            frc::Pose2d(-1_m, 0_m, frc::Rotation2d(90_deg)),
-            config);
+            while (timer.GetFPGATimestamp() < timeout)
+                m_drive.TankDriveVolts(2_V, -2_V);
+            
+        },{}),
+        m_ShooterOn,
+        frc2::InstantCommand([this]
+        {
+            static units::second_t timeout = timer.GetFPGATimestamp() + 2_s;
 
-        auto Trajectory2 = frc::TrajectoryGenerator::GenerateTrajectory(
-            frc::Pose2d(-1_m, 0_m, frc::Rotation2d(90_deg)),
-            {},
-            frc::Pose2d(-1_m, 0_m, frc::Rotation2d(0_deg)),
-            config);
+            while (timer.GetFPGATimestamp() < timeout)
+                m_drive.TankDriveVolts(2_V, -2_V);
+            
+        },{}),
+        m_TriggerSet,
+        frc2::InstantCommand([this]
+        {
+            static units::second_t timeout = timer.GetFPGATimestamp() + 4_s;
 
-        frc2::RamseteCommand ramseteCommand(
-            Trajectory, [this]()
-            { return m_drive.GetPose(); },
-            frc::RamseteController(AutoConstants::kRamseteB,
-                                   AutoConstants::kRamseteZeta),
-            frc::SimpleMotorFeedforward<units::meters>(
-                DriveConstants::ks, DriveConstants::kv, DriveConstants::ka),
-            DriveConstants::kDriveKinematics,
-            [this]
-            { return m_drive.GetWheelSpeeds(); },
-            frc2::PIDController(DriveConstants::kPDriveVel, DriveConstants::kIDriveVel, DriveConstants::kDDriveVel),
-            frc2::PIDController(DriveConstants::kPDriveVel, DriveConstants::kIDriveVel, DriveConstants::kDDriveVel),
-            [this](auto left, auto right)
-            { m_drive.TankDriveVolts(left, right); },
-            {&m_drive});
-        frc2::RamseteCommand ramseteCommand2(
-            Trajectory2, [this]()
-            { return m_drive.GetPose(); },
-            frc::RamseteController(AutoConstants::kRamseteB,
-                                   AutoConstants::kRamseteZeta),
-            frc::SimpleMotorFeedforward<units::meters>(
-                DriveConstants::ks, DriveConstants::kv, DriveConstants::ka),
-            DriveConstants::kDriveKinematics,
-            [this]
-            { return m_drive.GetWheelSpeeds(); },
-            frc2::PIDController(DriveConstants::kPDriveVel, DriveConstants::kIDriveVel, DriveConstants::kDDriveVel),
-            frc2::PIDController(DriveConstants::kPDriveVel, DriveConstants::kIDriveVel, DriveConstants::kDDriveVel),
-            [this](auto left, auto right)
-            { m_drive.TankDriveVolts(left, right); },
-            {&m_drive});
-
-        return new frc2::SequentialCommandGroup(
-            // ligo o compressor
-            frc2::InstantCommand([this]
-                                 { m_shooter.SetCompressor(1); },
-                                 {}),
-            m_ShooterOn,
-            frc2::WaitCommand(3_s),
-            m_TriggerSet,
-            frc2::WaitCommand(2_s),
-            m_TriggerReset,
-            m_ShooterOff,
-            m_IntakeSet,
-
-            std::move(ramseteCommand),
-            frc2::InstantCommand([this]
-                                 { m_drive.TankDriveVolts(0_V, 0_V); },
-                                 {}),
-            frc2::WaitCommand(5_s),
-            std::move(ramseteCommand2),
-            frc2::InstantCommand([this]
-                                 { m_drive.TankDriveVolts(0_V, 0_V); },
-                                 {}),
-            m_ShooterOn,
-            frc2::WaitCommand(2_s),
-            m_TriggerSet,
-            frc2::WaitCommand(2_s),
-            m_TriggerReset,
-            m_ShooterOff);
-    }
-    if (m_chooser.GetSelected() == 2)
-    {
-        frc::DifferentialDriveVoltageConstraint autoVoltageConstraint(
-            frc::SimpleMotorFeedforward<units::meters>(
-                DriveConstants::ks, DriveConstants::kv, DriveConstants::ka),
-            DriveConstants::kDriveKinematics, 10_V);
-
-        // Set up config for trajectory
-        frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
-                                     AutoConstants::kMaxAcceleration);
-        // Add kinematics to ensure max speed is actually obeyed
-        config.SetKinematics(DriveConstants::kDriveKinematics);
-        // Apply the voltage constraint
-        config.AddConstraint(autoVoltageConstraint);
-
-        auto Trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-            frc::Pose2d(0_m, 0_m, frc::Rotation2d(0_deg)),
-            {frc::Translation2d(-1.75_m, 0_m)},
-            frc::Pose2d(-1.75_m, -2_m, frc::Rotation2d(90_deg)),
-            config);
-
-        frc2::RamseteCommand ramseteCommand(
-            Trajectory, [this]()
-            { return m_drive.GetPose(); },
-            frc::RamseteController(AutoConstants::kRamseteB,
-                                   AutoConstants::kRamseteZeta),
-            frc::SimpleMotorFeedforward<units::meters>(
-                DriveConstants::ks, DriveConstants::kv, DriveConstants::ka),
-            DriveConstants::kDriveKinematics,
-            [this]
-            { return m_drive.GetWheelSpeeds(); },
-            frc2::PIDController(DriveConstants::kPDriveVel, DriveConstants::kIDriveVel, DriveConstants::kDDriveVel),
-            frc2::PIDController(DriveConstants::kPDriveVel, DriveConstants::kIDriveVel, DriveConstants::kDDriveVel),
-            [this](auto left, auto right)
-            { m_drive.TankDriveVolts(left, right); },
-            {&m_drive});
-
-        return new frc2::SequentialCommandGroup(
-            // ligo o compressor
-            frc2::InstantCommand([this]
-                                 { m_shooter.SetCompressor(1); },
-                                 {}),
-            m_ShooterOn,
-            frc2::WaitCommand(2_s),
-            m_TriggerSet,
-            frc2::WaitCommand(2_s),
-            m_TriggerReset,
-            m_ShooterOff,
-            m_IntakeSet,
-
-            std::move(ramseteCommand),
-            frc2::InstantCommand([this]
-                                 { m_drive.TankDriveVolts(0_V, 0_V); },
-                                 {}),
-
-            m_ShooterOff);
-    }
-    if (m_chooser.GetSelected() == 3)
-    {
-        frc::DifferentialDriveVoltageConstraint autoVoltageConstraint(
-            frc::SimpleMotorFeedforward<units::meters>(
-                DriveConstants::ks, DriveConstants::kv, DriveConstants::ka),
-            DriveConstants::kDriveKinematics, 10_V);
-
-        // Set up config for trajectory
-        frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
-                                     AutoConstants::kMaxAcceleration);
-        // Add kinematics to ensure max speed is actually obeyed
-        config.SetKinematics(DriveConstants::kDriveKinematics);
-        // Apply the voltage constraint
-        config.AddConstraint(autoVoltageConstraint);
-
-        auto Trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-            frc::Pose2d(0_m, 0_m, frc::Rotation2d(0_deg)),
-            {frc::Translation2d(-1_m, 0_m),
-             frc::Translation2d(-1_m, 1_m),
-             frc::Translation2d(-1_m, -1_m)},
-            frc::Pose2d(0_m, 0_m, frc::Rotation2d(0_deg)),
-            config);
-
-        frc2::RamseteCommand ramseteCommand(
-            Trajectory, [this]()
-            { return m_drive.GetPose(); },
-            frc::RamseteController(AutoConstants::kRamseteB,
-                                   AutoConstants::kRamseteZeta),
-            frc::SimpleMotorFeedforward<units::meters>(
-                DriveConstants::ks, DriveConstants::kv, DriveConstants::ka),
-            DriveConstants::kDriveKinematics,
-            [this]
-            { return m_drive.GetWheelSpeeds(); },
-            frc2::PIDController(DriveConstants::kPDriveVel, DriveConstants::kIDriveVel, DriveConstants::kDDriveVel),
-            frc2::PIDController(DriveConstants::kPDriveVel, DriveConstants::kIDriveVel, DriveConstants::kDDriveVel),
-            [this](auto left, auto right)
-            { m_drive.TankDriveVolts(left, right); },
-            {&m_drive});
-
-        return new frc2::SequentialCommandGroup(
-            // ligo o compressor
-            frc2::InstantCommand([this]
-                                 { m_shooter.SetCompressor(1); },
-                                 {}),
-            m_ShooterOn,
-            frc2::WaitCommand(2_s),
-            m_TriggerSet,
-            frc2::WaitCommand(2_s),
-            m_TriggerReset,
-            m_ShooterOff,
-            m_IntakeSet,
-
-            std::move(ramseteCommand),
-            frc2::InstantCommand([this]
-                                 { m_drive.TankDriveVolts(0_V, 0_V); },
-                                 {}),
-            m_ShooterOn,
-            frc2::WaitCommand(2_s),
-            m_TriggerSet,
-            frc2::WaitCommand(10_s),
-            m_TriggerReset,
-            m_ShooterOff,
-            m_IntakeSet,
-            m_ShooterOff);
-    }
+            while (timer.GetFPGATimestamp() < timeout)
+                m_drive.TankDriveVolts(2_V, -2_V);
+            
+        },
+        {}),
+        m_TriggerReset, 
+        m_ShooterOff 
+        );
 }
 void RobotContainer::Periodic()
 {
@@ -312,18 +128,18 @@ void RobotContainer::ConfigureButtonBindings()
 
     // Os comandos do Joystick foram desabilitados para evitar acionamentos por acidentes
     frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kA)
-        .WhenPressed(&m_ClimberSet)
-        .WhenReleased(&m_ClimberReset);
+        .WhenPressed(&m_ConveyorSet)
+        .WhenReleased(&m_ConveyorReset);
     frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kB)
-        .WhenPressed(&m_ClimberRevert)
-        .WhenReleased(&m_ClimberReset);
-    frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kRightBumper)
-        .WhenPressed(&m_AimForward)
-        .WhenReleased(&m_AimReset);
-    frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kLeftBumper)
-        .WhenPressed(&m_AimRewind)
-        .WhenReleased(&m_AimReset);
+        .WhenPressed(&m_ConveyorRevert)
+        .WhenReleased(&m_ConveyorReset);
 
+    frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kY)
+        .WhenPressed(&m_TriggerSet)
+        .WhenReleased(&m_TriggerReset);
+    frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kLeftBumper)
+        .WhenPressed(&m_ShooterOn)
+        .WhenReleased(&m_ShooterOff);
     /*
         Controle personalizado
 
@@ -383,7 +199,14 @@ void RobotContainer::ConfigureButtonBindings()
         .WhenPressed(&m_TriggerSet)
         .WhenReleased(&m_TriggerReset);
     frc2::JoystickButton(&m_operatorController, kShooterAimButton)
-        .WhenActive(&m_AimTarget);
+        .WhenPressed(&m_ShooterOn)
+        .WhenReleased(&m_ShooterOff);
+    frc2::JoystickButton(&m_operatorController, kAimForwardButton)
+        .WhenPressed(&m_AimForward)
+        .WhenReleased(&m_AimReset);
+    frc2::JoystickButton(&m_operatorController, kAimRevertButton)
+        .WhenPressed(&m_AimRewind)
+        .WhenReleased(&m_AimReset);
 }
 frc2::Command *RobotContainer::AimTarget()
 {
