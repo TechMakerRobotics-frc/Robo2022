@@ -81,13 +81,13 @@ private:
 
   // Comandos para o Conveyor
   frc2::InstantCommand m_ConveyorSet{[this]
-                                     { m_shooter.SetConveyor(0.5); },
+                                     { m_shooter.SetConveyor(1); },
                                      {}};
   frc2::InstantCommand m_ConveyorReset{[this]
                                        { m_shooter.SetConveyor(0); },
                                        {}};
   frc2::InstantCommand m_ConveyorRevert{[this]
-                                        { m_shooter.SetConveyor(-0.5); },
+                                        { m_shooter.SetConveyor(-1); },
                                         {}};
                                         
   // Final do Conveyor
@@ -126,10 +126,10 @@ private:
                                     { m_shooter.SetAim(0); },
                                     {}};*/
   frc2::InstantCommand m_AimForward{[this]
-                                    { m_shooter.ActiveAim(1); },
+                                    { m_shooter.ActiveAim(0); },
                                     {}};
   frc2::InstantCommand m_AimRewind{[this]
-                                    { m_shooter.ActiveAim(-1); },
+                                    { m_shooter.ActiveAim(0); },
                                     {}};
   frc2::InstantCommand m_AimReset{[this]
                                     { m_shooter.ActiveAim(0); },

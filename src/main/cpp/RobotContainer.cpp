@@ -18,6 +18,7 @@
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/WaitCommand.h>
+#include <frc2/command/WaitUntilCommand.h>
 #include <frc2/command/button/JoystickButton.h>
 #include <frc2/command/button/POVButton.h>
 #include "cameraserver/CameraServer.h"
@@ -69,36 +70,22 @@ frc2::Command *RobotContainer::GetAutonomousCommand()
 {
 
     return new frc2::SequentialCommandGroup(
-        // ligo o compressor
-frc2::InstantCommand([this]
-        {
-            static units::second_t timeout = timer.GetFPGATimestamp() + 2_s;
-
-            while (timer.GetFPGATimestamp() < timeout)
-                m_drive.TankDriveVolts(2_V, -2_V);
-            
-        },{}),
-        m_ShooterOn,
         frc2::InstantCommand([this]
         {
-            static units::second_t timeout = timer.GetFPGATimestamp() + 2_s;
+            m_shooter.ResetEncoders();
+            m_shooter.SetAim(-3_V);
 
-            while (timer.GetFPGATimestamp() < timeout)
-                m_drive.TankDriveVolts(2_V, -2_V);
-            
         },{}),
-        m_TriggerSet,
+        frc2::WaitUntilCommand(std::function<bool()> { [this](){ return m_shooter.getAimEncoder()>=400; } }),
+        frc2::WaitCommand(500_ms),
         frc2::InstantCommand([this]
         {
-            static units::second_t timeout = timer.GetFPGATimestamp() + 4_s;
+            m_shooter.SetAim(3_V);
 
-            while (timer.GetFPGATimestamp() < timeout)
-                m_drive.TankDriveVolts(2_V, -2_V);
-            
-        },
-        {}),
-        m_TriggerReset, 
-        m_ShooterOff 
+        },{}),
+        frc2::WaitUntilCommand(std::function<bool()> { [this](){ return m_shooter.getAimEncoder()<=0; } }),
+        frc2::WaitCommand(500_ms)
+
         );
 }
 void RobotContainer::Periodic()
@@ -114,13 +101,6 @@ void RobotContainer::Periodic()
 
     // calculate distance
     distanceFromLimelightToGoal = (goalHeight - limelightLensHeight) / tan(angleToGoalRadians);
-    frc::SmartDashboard::PutNumber("Alvo - Angulo Horizontal", targetOffsetAngle_Horizontal);
-    frc::SmartDashboard::PutNumber("Alvo - Angulo Vertical", targetOffsetAngle_Vertical);
-    frc::SmartDashboard::PutNumber("Area do Alvo", targetArea);
-    frc::SmartDashboard::PutNumber("Angulo para o Alvo", angleToGoalDegrees);
-    frc::SmartDashboard::PutNumber("Distancia para o Alvo", distanceFromLimelightToGoal);
-    frc::SmartDashboard::PutNumber("LeftY", m_driverController.GetLeftY());
-    frc::SmartDashboard::PutNumber("RightX", m_driverController.GetRightX());
 }
 
 void RobotContainer::ConfigureButtonBindings()

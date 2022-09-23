@@ -21,7 +21,7 @@ ShooterSubsystem::ShooterSubsystem()
       m_trigger{kTriggerMotorPort, rev::CANSparkMaxLowLevel::MotorType::kBrushless},
       m_aim{kAimMotorPort},
       compressor{frc::PneumaticsModuleType::CTREPCM},
-      m_AimEncoder{kAimEncoderPorts[0], kAimEncoderPorts[1], false, frc::Encoder::k1X}
+      m_AimEncoder{kAimEncoderPorts[0], kAimEncoderPorts[1], true, frc::Encoder::k1X}
 {
   m_conveyor.SetInverted(false);
   m_right.SetInverted(true);
@@ -29,7 +29,7 @@ ShooterSubsystem::ShooterSubsystem()
   m_AimEncoder.SetDistancePerPulse(1);
 
   m_AimEncoder.SetSamplesToAverage(10);
-  m_trigger.SetInverted(true);
+  m_trigger.SetInverted(false);
 
   ResetEncoders();
 }
@@ -86,31 +86,21 @@ void ShooterSubsystem::SetTrigger(double speed)
   m_conveyor.Set(speed);
   m_trigger.Set(speed);
 }
+bool ShooterSubsystem::getAimGreatThen(double value){
 
-void ShooterSubsystem::SetAim(double position)
+  return  m_AimEncoder.GetDistance()>value;
+}
+bool ShooterSubsystem::getAimLowerThen(double value){
+  return  m_AimEncoder.GetDistance()<value;
+
+  }
+void ShooterSubsystem::SetAim(units::voltage::volt_t position)
 {
-  double speed = 0;
-  if (m_AimEncoder.GetDistance() > position)
-  {
-    speed = 0.5;
-    while (m_AimEncoder.GetDistance()> position)
-    {
-      m_aim.Set(speed);
-    }
-  }
-  else if (m_AimEncoder.GetDistance() < position){
-    speed = -0.5;
-    while (m_AimEncoder.GetDistance()< position)
-    {
-      m_aim.Set(speed);
-    }
-  }
-
-  m_aim.Set(0);
+  m_aim.SetVoltage(position);
 }
 void ShooterSubsystem::ActiveAim(double speed)
 {
-  if((speed>0 && m_AimEncoder.GetDistance()<400) ||(speed<0 && m_AimEncoder.GetDistance()<20))
+  
    m_aim.Set(speed);
 }
 
@@ -125,6 +115,9 @@ void ShooterSubsystem::SetCompressor(bool state)
     compressor.Enabled();
   else
     compressor.Disable();
+}
+double ShooterSubsystem::getAimEncoder(){
+  return m_AimEncoder.GetDistance();
 }
 void ShooterSubsystem::Periodic()
 {

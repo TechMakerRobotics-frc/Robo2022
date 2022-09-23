@@ -42,13 +42,15 @@ class ShooterSubsystem : public frc2::SubsystemBase {
 
   void SetTrigger(double speed);
   void SetConveyor(double speed);
-  void SetAim(double position);
-void ActiveAim(double speed);
+  void SetAim(units::voltage::volt_t position);
+  void ActiveAim(double speed);
 
   void ToggleIntake();
   void SetCompressor(bool state);
   void SetShooter(double speed);
-
+  double getAimEncoder();
+  bool getAimGreatThen(double value);
+  bool getAimLowerThen(double value);
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be
