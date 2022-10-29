@@ -23,13 +23,13 @@ ShooterSubsystem::ShooterSubsystem()
       compressor{frc::PneumaticsModuleType::CTREPCM},
       m_AimEncoder{kAimEncoderPorts[0], kAimEncoderPorts[1], true, frc::Encoder::k1X}
 {
-  m_conveyor.SetInverted(false);
+  m_conveyor.SetInverted(true);
   m_right.SetInverted(true);
   // Set the distance per pulse for the encoders
   m_AimEncoder.SetDistancePerPulse(1);
 
   m_AimEncoder.SetSamplesToAverage(10);
-  m_trigger.SetInverted(false);
+  m_trigger.SetInverted(true);
 
   ResetEncoders();
 }
@@ -45,7 +45,7 @@ frc2::Command *ShooterSubsystem::SetIntake()
                            { m_intake.Set(0.5); },
                            {}),
       frc2::InstantCommand([this]
-                           { m_conveyor.Set(0.5); },
+                           { m_conveyor.Set(1); },
                            {}),
       frc2::InstantCommand([this]
                            { intake.Set(intake.kForward); },
@@ -81,7 +81,7 @@ void ShooterSubsystem::SetConveyor(double speed)
 void ShooterSubsystem::SetTrigger(double speed)
 {
   if(speed>0.5)
-  m_conveyor.Set(0.5);
+  m_conveyor.Set(1);
   else
   m_conveyor.Set(speed);
   m_trigger.Set(speed);
