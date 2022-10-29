@@ -117,9 +117,19 @@ void RobotContainer::ConfigureButtonBindings()
     frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kY)
         .WhenPressed(&m_TriggerSet)
         .WhenReleased(&m_TriggerReset);
+    frc2::JoystickButton(&m_driverController,(int) frc::XboxController::Button::kX)
+         .WhenPressed(&m_IntakeSet)
+        .WhenReleased(&m_IntakeReset);
     frc2::JoystickButton(&m_driverController, (int)frc::XboxController::Button::kLeftBumper)
         .WhenPressed(&m_ShooterOn)
         .WhenReleased(&m_ShooterOff);
+
+    frc2::JoystickButton(&m_driverController,(int) frc::XboxController::Button::kRightBumper)
+        .WhenPressed(&m_ledReset)
+        .WhenReleased(&m_ledSet);
+    
+
+    
     /*
         Controle personalizado
 
